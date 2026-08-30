@@ -6,10 +6,18 @@ import { LanguageSelector } from "./language-selector";
 import { ModeToggle } from "./mode-toggle";
 import { MobileSidebar, Sidebar } from "./sidebar";
 import { AppProviders, useApp } from "@/components/providers/app-providers";
+import { BusinessSetup } from "@/components/setup/business-setup";
 import { longDateLabel } from "@/lib/format";
 
 function TopBar({ onMenu }: { onMenu: () => void }) {
-  const { data, mounted } = useApp();
+  const { data, mounted, profile } = useApp();
+  const owner = profile?.ownerName ?? data?.ownerName ?? "Owner";
+  const initials = owner
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-ink/85 backdrop-blur-md">
       <div className="flex h-16 items-center gap-3 px-4 sm:px-6">
@@ -47,9 +55,9 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
           <LanguageSelector />
           <div
             className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-gold to-amber-600 text-xs font-bold text-ink"
-            title="Karim Sahab — Owner"
+            title={`${owner} — Owner`}
           >
-            KS
+            {initials}
           </div>
         </div>
       </div>
@@ -62,20 +70,30 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
   );
 }
 
-export function AppShell({ children }: { children: ReactNode }) {
+function ShellGate({ children }: { children: ReactNode }) {
+  const { profile } = useApp();
   const [navOpen, setNavOpen] = useState(false);
+
+  if (!profile) return <BusinessSetup />;
+
+  return (
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <MobileSidebar open={navOpen} onClose={() => setNavOpen(false)} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TopBar onMenu={() => setNavOpen(true)} />
+        <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-6 sm:px-6">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export function AppShell({ children }: { children: ReactNode }) {
   return (
     <AppProviders>
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <MobileSidebar open={navOpen} onClose={() => setNavOpen(false)} />
-        <div className="flex min-w-0 flex-1 flex-col">
-          <TopBar onMenu={() => setNavOpen(true)} />
-          <main className="mx-auto w-full max-w-[1240px] flex-1 px-4 py-6 sm:px-6">
-            {children}
-          </main>
-        </div>
-      </div>
+      <ShellGate>{children}</ShellGate>
     </AppProviders>
   );
 }

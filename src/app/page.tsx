@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { Banknote, HandCoins, TrendingDown, TrendingUp } from "lucide-react";
+import Link from "next/link";
+import { Banknote, HandCoins, Package, Plus, TrendingDown, TrendingUp } from "lucide-react";
 import { useApp } from "@/components/providers/app-providers";
 import { buildIntelligence } from "@/lib/intelligence";
 import { formatPKR } from "@/lib/format";
@@ -48,7 +49,7 @@ export default function DashboardPage() {
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight text-fg">
-            Assalam, {data.ownerName.split(" ")[0]} Sahab
+            Assalam, {data.ownerName.split(" ")[0]}!
           </h1>
           <p className="mt-1 text-sm text-muted">
             Here&apos;s how{" "}
@@ -61,6 +62,41 @@ export default function DashboardPage() {
 
       {/* AI panel */}
       <AiPanel intel={intel} />
+
+      {/* First-run empty state (personalized business with no data yet) */}
+      {data.sales.length === 0 && data.products.length === 0 && (
+        <div className="relative overflow-hidden rounded-2xl border border-brand/25 bg-gradient-to-br from-panel2 via-panel to-panel p-6 shadow-glow">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-brand/10 blur-3xl" />
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-brand to-brand-deep text-white shadow-glow">
+              <Package className="h-6 w-6" />
+            </span>
+            <div className="flex-1">
+              <h2 className="text-base font-extrabold text-fg">
+                Welcome to {data.businessName}!
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
+                Add your first product or service, then record a sale — your dashboard,
+                insights and Munshi will come alive with your own numbers.
+              </p>
+            </div>
+            <div className="flex shrink-0 gap-2">
+              <Link
+                href="/inventory"
+                className="flex h-10 items-center gap-1.5 rounded-xl bg-panel3 px-4 text-sm font-bold text-fg hover:bg-line"
+              >
+                <Package className="h-4 w-4" /> Add Product
+              </Link>
+              <Link
+                href="/sales"
+                className="flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-br from-brand to-brand-deep px-4 text-sm font-bold text-white shadow-glow hover:brightness-110"
+              >
+                <Plus className="h-4 w-4" /> Record Sale
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* KPI row */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

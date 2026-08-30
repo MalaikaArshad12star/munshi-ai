@@ -67,18 +67,20 @@ export function composeAnswer(
   const rec = intel.health.recommendation;
 
   switch (intent) {
-    case "greeting":
+    case "greeting": {
+      const first = intel.ownerName.split(" ")[0];
       return {
         intent,
         quick: pick(lang, {
-          en: "Assalam! I'm your Munshi. Ask me about your sales, profit, expenses, customers, stock or udhaar.",
-          ur: "السلام! میں آپ کا منشی ہوں۔ فروخت، منافع، اخراجات، گاہک، اسٹاک یا ادھار کے بارے میں پوچھیں۔",
-          roman: "Assalam! Main aap ka Munshi hoon. Sales, munafa, kharchay, grahak, stock ya udhaar ke baare mein poochain.",
+          en: `Assalam, ${first}! I'm your Munshi for ${intel.businessName}. Ask me about sales, profit, expenses, customers, stock or udhaar.`,
+          ur: `السلام، ${first}! میں ${intel.businessName} کا آپ کا منشی ہوں۔ فروخت، منافع، اخراجات، گاہک، اسٹاک یا ادھار پوچھیں۔`,
+          roman: `Assalam, ${first}! Main ${intel.businessName} ka aap ka Munshi hoon. Sales, munafa, kharchay, grahak, stock ya udhaar poochain.`,
         }),
         numbers: [],
         insight: "",
         action: "",
       };
+    }
 
     case "sales":
       return {

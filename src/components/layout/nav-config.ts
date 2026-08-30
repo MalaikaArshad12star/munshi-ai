@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Mic,
   Package,
+  Settings,
   Sparkles,
   TrendingUp,
   Users,
@@ -25,5 +26,6 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/customers", label: "Customers", tKey: "nav.customers", icon: Users },
   { href: "/inventory", label: "Inventory", tKey: "nav.inventory", icon: Package },
   { href: "/ask-munshi", label: "Ask Munshi", tKey: "nav.askMunshi", icon: Sparkles, badge: "AI" },
-  { href: "/voice", label: "Voice Munshi", tKey: "nav.voice", icon: Mic, badge: "Soon", soon: true },
+  { href: "/voice", label: "Voice Munshi", tKey: "nav.voice", icon: Mic },
+  { href: "/settings", label: "Settings", tKey: "nav.settings", icon: Settings },
 ];

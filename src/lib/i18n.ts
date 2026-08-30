@@ -13,6 +13,7 @@ const en: Dict = {
   "nav.inventory": "Inventory",
   "nav.askMunshi": "Ask Munshi",
   "nav.voice": "Voice Munshi",
+  "nav.settings": "Settings",
 
   "common.add": "Add",
   "common.edit": "Edit",
@@ -24,6 +25,7 @@ const en: Dict = {
   "common.view": "View",
   "common.actions": "Actions",
   "common.all": "All",
+  "common.allCategories": "All categories",
   "common.today": "Today",
   "common.total": "Total",
   "common.date": "Date",
@@ -88,6 +90,7 @@ const ur: Dict = {
   "nav.inventory": "اسٹاک",
   "nav.askMunshi": "منشی سے پوچھیں",
   "nav.voice": "وائس منشی",
+  "nav.settings": "ترتیبات",
 
   "common.add": "شامل کریں",
   "common.edit": "ترمیم",
@@ -99,6 +102,7 @@ const ur: Dict = {
   "common.view": "دیکھیں",
   "common.actions": "کارروائی",
   "common.all": "تمام",
+  "common.allCategories": "تمام اقسام",
   "common.today": "آج",
   "common.total": "کل",
   "common.date": "تاریخ",
@@ -163,6 +167,7 @@ const roman: Dict = {
   "nav.inventory": "Stock",
   "nav.askMunshi": "Munshi se poochain",
   "nav.voice": "Voice Munshi",
+  "nav.settings": "Settings",
 
   "common.add": "Shamil karein",
   "common.edit": "Tabdeeli",
@@ -174,6 +179,7 @@ const roman: Dict = {
   "common.view": "Dekhein",
   "common.actions": "Actions",
   "common.all": "Sab",
+  "common.allCategories": "Sab categories",
   "common.today": "Aaj",
   "common.total": "Total",
   "common.date": "Tareekh",

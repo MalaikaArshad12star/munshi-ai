@@ -36,6 +36,8 @@ export interface Forecast {
 
 export interface Intelligence {
   kpis: Kpis;
+  businessName: string;
+  ownerName: string;
   sales: {
     total: number;
     today: number;
@@ -258,6 +260,8 @@ export function buildIntelligence(data: BusinessData): Intelligence {
 
   return {
     kpis,
+    businessName: data.businessName,
+    ownerName: data.ownerName,
     sales: {
       total: kpis.last30.revenue,
       today: kpis.today.sales,

@@ -100,7 +100,7 @@ export default function ExpensesPage() {
       <div className="grid grid-cols-2 gap-2 rounded-2xl border border-line bg-panel p-3 sm:grid-cols-3">
         <Input placeholder={`${t("common.search")}…`} value={search} onChange={(e) => setSearch(e.target.value)} className="col-span-2 sm:col-span-1" />
         <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="all">{t("common.all")} {t("common.category").toLowerCase()}s</option>
+          <option value="all">{t("common.allCategories")}</option>
           {EXPENSE_CATEGORIES.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}

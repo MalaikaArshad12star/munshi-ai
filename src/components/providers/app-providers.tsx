@@ -10,7 +10,8 @@ import {
   type ReactNode,
 } from "react";
 import type { AppSettings, BusinessData, Language, ViewMode } from "@/lib/types";
-import { loadBusinessData, saveBusinessData } from "@/lib/store";
+import { loadBusinessData, saveBusinessData, loadPersonalData, savePersonalData } from "@/lib/store";
+import { loadProfile, saveProfile, demoProfile, type BusinessProfile, type BusinessMode } from "@/lib/profile";
 import { computeKpis, type Kpis } from "@/lib/kpis";
 import { translate } from "@/lib/i18n";
 import {
@@ -57,6 +58,9 @@ interface AppContextValue {
   setLanguage: (lang: Language) => void;
   setMode: (mode: ViewMode) => void;
   t: (key: string) => string;
+  profile: BusinessProfile | null;
+  setProfile: (p: BusinessProfile) => void;
+  switchMode: (mode: BusinessMode) => void;
   data: BusinessData | null;
   kpis: Kpis | null;
   actions: BusinessActions;
@@ -77,6 +81,11 @@ function readSettings(): AppSettings {
   return DEFAULT_SETTINGS;
 }
 
+function dataForProfile(p: BusinessProfile | null): BusinessData | null {
+  if (typeof window === "undefined" || !p) return null;
+  return p.mode === "demo" ? loadBusinessData() : loadPersonalData(p);
+}
+
 export function AppProviders({ children }: { children: ReactNode }) {
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -84,8 +93,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
     () => false,
   );
   const [settings, setSettings] = useState<AppSettings>(readSettings);
+  const [profile, setProfileState] = useState<BusinessProfile | null>(() =>
+    typeof window === "undefined" ? null : loadProfile(),
+  );
   const [data, setData] = useState<BusinessData | null>(() =>
-    typeof window === "undefined" ? null : loadBusinessData(),
+    dataForProfile(typeof window === "undefined" ? null : loadProfile()),
   );
 
   const persistSettings = useCallback((next: AppSettings) => {
@@ -106,6 +118,24 @@ export function AppProviders({ children }: { children: ReactNode }) {
     [persistSettings, settings],
   );
 
+  const setProfile = useCallback(
+    (next: BusinessProfile) => {
+      saveProfile(next);
+      setProfileState(next);
+      setData(dataForProfile(next));
+      persistSettings({ ...settings, language: next.language });
+    },
+    [persistSettings, settings],
+  );
+
+  const switchMode = useCallback(
+    (mode: BusinessMode) => {
+      const base = profile ?? demoProfile();
+      setProfile({ ...base, mode });
+    },
+    [profile, setProfile],
+  );
+
   const t = useCallback((key: string) => translate(settings.language, key), [settings.language]);
 
   const kpis = useMemo(() => (data ? computeKpis(data) : null), [data]);
@@ -114,7 +144,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
     const commit = <T,>(r: MutResult<T>): MutResult<T> => {
       if (r.ok) {
         setData(r.data);
-        saveBusinessData(r.data);
+        if (profile?.mode === "personal") savePersonalData(r.data);
+        else saveBusinessData(r.data);
       }
       return r;
     };
@@ -133,11 +164,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
       updateProduct: (id, i) => commit(updateProduct(base, id, i)),
       deleteProduct: (id) => commit(deleteProduct(base, id)),
     };
-  }, [data]);
+  }, [data, profile]);
 
   const value = useMemo<AppContextValue>(
-    () => ({ mounted, settings, setLanguage, setMode, t, data, kpis, actions }),
-    [mounted, settings, setLanguage, setMode, t, data, kpis, actions],
+    () => ({ mounted, settings, setLanguage, setMode, t, profile, setProfile, switchMode, data, kpis, actions }),
+    [mounted, settings, setLanguage, setMode, t, profile, setProfile, switchMode, data, kpis, actions],
   );
 
   return (
