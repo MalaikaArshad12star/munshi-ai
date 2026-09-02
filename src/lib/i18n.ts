@@ -11,6 +11,7 @@ const en: Dict = {
   "nav.expenses": "Expenses",
   "nav.customers": "Customers",
   "nav.inventory": "Inventory",
+  "nav.documents": "Documents",
   "nav.askMunshi": "Ask Munshi",
   "nav.voice": "Voice Munshi",
   "nav.settings": "Settings",
@@ -80,6 +81,19 @@ const en: Dict = {
   "inventory.service": "Service",
   "inventory.lowStock": "Low stock",
   "inventory.inStock": "In stock",
+
+  "documents.title": "Documents",
+  "documents.add": "Upload Document",
+  "documents.edit": "Edit Document",
+  "documents.receipts": "Receipts",
+  "documents.invoices": "Invoices",
+  "documents.expenseBills": "Expense Bills",
+  "documents.purchaseBills": "Purchase Bills",
+  "documents.all": "All Documents",
+  "documents.uploadFile": "Upload file",
+  "documents.noDocs": "No documents yet",
+  "documents.noDocsSub": "Upload receipts, invoices, bills, and more to keep everything in one place.",
+  "documents.fileRequired": "Please select a file to upload.",
 };
 
 const ur: Dict = {
@@ -88,6 +102,7 @@ const ur: Dict = {
   "nav.expenses": "اخراجات",
   "nav.customers": "گاہک",
   "nav.inventory": "اسٹاک",
+  "nav.documents": "دستاویزات",
   "nav.askMunshi": "منشی سے پوچھیں",
   "nav.voice": "وائس منشی",
   "nav.settings": "ترتیبات",
@@ -157,6 +172,19 @@ const ur: Dict = {
   "inventory.service": "خدمت",
   "inventory.lowStock": "کم اسٹاک",
   "inventory.inStock": "اسٹاک میں",
+
+  "documents.title": "دستاویزات",
+  "documents.add": "دستاویز اپ لوڈ کریں",
+  "documents.edit": "دستاویز میں ترمیم",
+  "documents.receipts": "رسیدیں",
+  "documents.invoices": "انوائسز",
+  "documents.expenseBills": "اخراجات کے بل",
+  "documents.purchaseBills": "خریداری کے بل",
+  "documents.all": "تمام دستاویزات",
+  "documents.uploadFile": "فائل اپ لوڈ کریں",
+  "documents.noDocs": "ابھی کوئی دستاویز نہیں",
+  "documents.noDocsSub": "رسیدیں، انوائسز، بل اور دیگر دستاویزات ایک جگہ محفوظ کریں۔",
+  "documents.fileRequired": "براہ کرم اپ لوڈ کے لیے فائل منتخب کریں۔",
 };
 
 const roman: Dict = {
@@ -165,6 +193,7 @@ const roman: Dict = {
   "nav.expenses": "Kharchay",
   "nav.customers": "Grahak",
   "nav.inventory": "Stock",
+  "nav.documents": "Documents",
   "nav.askMunshi": "Munshi se poochain",
   "nav.voice": "Voice Munshi",
   "nav.settings": "Settings",
@@ -234,6 +263,19 @@ const roman: Dict = {
   "inventory.service": "Service",
   "inventory.lowStock": "Kam stock",
   "inventory.inStock": "Stock mein",
+
+  "documents.title": "Documents",
+  "documents.add": "Document upload karein",
+  "documents.edit": "Document mein tabdeeli",
+  "documents.receipts": "Receipts",
+  "documents.invoices": "Invoices",
+  "documents.expenseBills": "Expense bills",
+  "documents.purchaseBills": "Purchase bills",
+  "documents.all": "Sab documents",
+  "documents.uploadFile": "File upload karein",
+  "documents.noDocs": "Abhi koi document nahi",
+  "documents.noDocsSub": "Receipts, invoices, bills aur documents ek jagah save karein.",
+  "documents.fileRequired": "Upload ke liye file select karein.",
 };
 
 const dictionaries: Record<Language, Dict> = { en, ur, roman };

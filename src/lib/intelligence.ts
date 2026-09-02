@@ -69,6 +69,7 @@ export interface Intelligence {
     helping: string[];
     attention: string[];
     recommendation: Recommendation | null;
+    hasData: boolean;
   };
   insights: SmartInsight[];
   recommendations: Recommendation[];
@@ -180,54 +181,64 @@ export function buildIntelligence(data: BusinessData): Intelligence {
   const forecast: Forecast = { next7Sales, next7Expenses, next7Profit, trend, confidence };
 
   // ---- Recommendations (priority-based) ----
-  const recommendations: Recommendation[] = [];
-  if (udhaarRatio > 12) {
-    recommendations.push({
-      priority: 1,
-      problem: "High outstanding udhaar",
-      why: `${Math.round(udhaarRatio)}% of monthly revenue is tied up in customer credit.`,
-      action: "Follow up on outstanding customer payments to free up cash flow.",
-    });
-  }
+  const hasHealthData = kpis.health.hasData;
   const lowBestSeller = low.find((p) => best.some((b) => b.id === p.id));
-  if (lowBestSeller) {
-    recommendations.push({
-      priority: 1,
-      problem: `Best-seller running low: ${lowBestSeller.name}`,
-      why: "A top-selling product is near out-of-stock, risking lost sales.",
-      action: `Restock ${lowBestSeller.name} as soon as possible.`,
-    });
-  } else if (out.length) {
-    recommendations.push({
-      priority: 1,
-      problem: `Out of stock: ${out[0].name}`,
-      why: "You cannot sell what you do not have.",
-      action: `Restock ${out[0].name}.`,
-    });
-  }
-  if (expGrowth > 10 && expGrowth > salesGrowth) {
-    recommendations.push({
-      priority: 2,
-      problem: "Expenses rising faster than sales",
-      why: `Expenses grew ${expGrowth.toFixed(0)}% week-over-week.`,
-      action: "Review your fastest-growing expense category.",
-    });
-  }
-  if (kpis.last30.marginPct < 10) {
-    recommendations.push({
-      priority: 2,
-      problem: "Thin profit margin",
-      why: `Net margin is ${kpis.last30.marginPct.toFixed(1)}%.`,
-      action: "Review product pricing and high-cost expenses.",
-    });
-  }
-  if (!recommendations.length) {
+  const recommendations: Recommendation[] = [];
+  if (!hasHealthData) {
     recommendations.push({
       priority: 3,
-      problem: "No urgent issues",
-      why: "Health, margins and stock look stable.",
-      action: "Keep momentum — focus on your best-selling products.",
+      problem: "Start tracking your business",
+      why: "Record your first product and sale so Munshi can score your business health and surface insights.",
+      action: "Add a product, then record your first sale.",
     });
+  } else {
+    if (udhaarRatio > 12) {
+      recommendations.push({
+        priority: 1,
+        problem: "High outstanding udhaar",
+        why: `${Math.round(udhaarRatio)}% of monthly revenue is tied up in customer credit.`,
+        action: "Follow up on outstanding customer payments to free up cash flow.",
+      });
+    }
+    if (lowBestSeller) {
+      recommendations.push({
+        priority: 1,
+        problem: `Best-seller running low: ${lowBestSeller.name}`,
+        why: "A top-selling product is near out-of-stock, risking lost sales.",
+        action: `Restock ${lowBestSeller.name} as soon as possible.`,
+      });
+    } else if (out.length) {
+      recommendations.push({
+        priority: 1,
+        problem: `Out of stock: ${out[0].name}`,
+        why: "You cannot sell what you do not have.",
+        action: `Restock ${out[0].name}.`,
+      });
+    }
+    if (expGrowth > 10 && expGrowth > salesGrowth) {
+      recommendations.push({
+        priority: 2,
+        problem: "Expenses rising faster than sales",
+        why: `Expenses grew ${expGrowth.toFixed(0)}% week-over-week.`,
+        action: "Review your fastest-growing expense category.",
+      });
+    }
+    if (kpis.last30.marginPct < 10) {
+      recommendations.push({
+        priority: 2,
+        problem: "Thin profit margin",
+        why: `Net margin is ${kpis.last30.marginPct.toFixed(1)}%.`,
+        action: "Review product pricing and high-cost expenses.",
+      });
+    }
+    if (!recommendations.length) {
+      recommendations.push({
+        priority: 3,
+        problem: "No urgent issues",
+        why: "Health, margins and stock look stable.",
+        action: "Keep momentum — focus on your best-selling products.",
+      });
+    }
   }
   recommendations.sort((a, b) => a.priority - b.priority);
 
@@ -241,21 +252,23 @@ export function buildIntelligence(data: BusinessData): Intelligence {
 
   // ---- Smart insights ----
   const insights: SmartInsight[] = [];
-  if (kpis.health.factors.find((f) => f.key === "trend")?.status === "good") {
-    insights.push({ id: "i-trend", type: "positive", title: "Sales are climbing", body: `Revenue is up week-over-week. Keep your best sellers stocked.` });
-  }
-  if (lowBestSeller) {
-    insights.push({ id: "i-low", type: "opportunity", title: "Restock a best-seller", body: `${lowBestSeller.name} sells fast and is running low. Restocking may prevent lost sales.` });
-  }
-  if (udhaarRatio > 12) {
-    insights.push({ id: "i-udhaar", type: "warning", title: "Udhaar is tying up cash", body: `${Math.round(udhaarRatio)}% of monthly revenue is outstanding. Recovering some would improve cash flow.` });
-  }
-  if (expGrowth > 15) {
-    const topCat = kpis.expenseByCategory[0];
-    insights.push({ id: "i-exp", type: "expense", title: "Expenses rising", body: `Expenses grew ${expGrowth.toFixed(0)}% this week${topCat ? `, led by ${topCat.category}` : ""}.` });
-  }
-  if (best[0]) {
-    insights.push({ id: "i-best", type: "positive", title: "Top performer", body: `${best[0].name} brought in the most revenue this week.` });
+  if (hasHealthData) {
+    if (kpis.health.factors.find((f) => f.key === "trend")?.status === "good") {
+      insights.push({ id: "i-trend", type: "positive", title: "Sales are climbing", body: `Revenue is up week-over-week. Keep your best sellers stocked.` });
+    }
+    if (lowBestSeller) {
+      insights.push({ id: "i-low", type: "opportunity", title: "Restock a best-seller", body: `${lowBestSeller.name} sells fast and is running low. Restocking may prevent lost sales.` });
+    }
+    if (udhaarRatio > 12) {
+      insights.push({ id: "i-udhaar", type: "warning", title: "Udhaar is tying up cash", body: `${Math.round(udhaarRatio)}% of monthly revenue is outstanding. Recovering some would improve cash flow.` });
+    }
+    if (expGrowth > 15) {
+      const topCat = kpis.expenseByCategory[0];
+      insights.push({ id: "i-exp", type: "expense", title: "Expenses rising", body: `Expenses grew ${expGrowth.toFixed(0)}% this week${topCat ? `, led by ${topCat.category}` : ""}.` });
+    }
+    if (best[0]) {
+      insights.push({ id: "i-best", type: "positive", title: "Top performer", body: `${best[0].name} brought in the most revenue this week.` });
+    }
   }
 
   return {
@@ -283,6 +296,7 @@ export function buildIntelligence(data: BusinessData): Intelligence {
       helping,
       attention,
       recommendation: recommendations[0] ?? null,
+      hasData: hasHealthData,
     },
     insights,
     recommendations,

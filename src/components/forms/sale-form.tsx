@@ -9,7 +9,7 @@ import { formatPKR, todayISO } from "@/lib/format";
 import type { PaymentMethod, PaymentStatus, Sale, SaleItem } from "@/lib/types";
 
 interface ItemRow {
-  productId: string;
+  name: string;
   qty: number;
   unitPrice: number;
 }
@@ -20,8 +20,8 @@ export function SaleForm({ initial, onDone }: { initial?: Sale; onDone: () => vo
 
   const [rows, setRows] = useState<ItemRow[]>(
     initial
-      ? initial.items.map((i) => ({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice }))
-      : [{ productId: "", qty: 1, unitPrice: 0 }],
+      ? initial.items.map((i) => ({ name: i.productName, qty: i.qty, unitPrice: i.unitPrice }))
+      : [{ name: "", qty: 1, unitPrice: 0 }],
   );
   const [customerId, setCustomerId] = useState(initial?.customerId ?? "");
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(initial?.paymentMethod ?? "cash");
@@ -44,9 +44,9 @@ export function SaleForm({ initial, onDone }: { initial?: Sale; onDone: () => vo
       rs.map((r, i) => {
         if (i !== idx) return r;
         const next = { ...r, ...patch };
-        // auto-fill selling price when a product is chosen
-        if (patch.productId !== undefined) {
-          const p = products.find((x) => x.id === patch.productId);
+        if (patch.name !== undefined) {
+          const trimmed = patch.name.trim();
+          const p = trimmed ? products.find((x) => x.name.toLowerCase() === trimmed.toLowerCase()) : undefined;
           if (p) next.unitPrice = p.salePrice;
         }
         return next;
@@ -56,7 +56,7 @@ export function SaleForm({ initial, onDone }: { initial?: Sale; onDone: () => vo
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    const validRows = rows.filter((r) => r.productId);
+    const validRows = rows.filter((r) => r.name.trim());
     if (!validRows.length) e.items = t("common.required");
     if (validRows.some((r) => !Number.isFinite(r.qty) || r.qty <= 0)) e.qty = "Quantity must be a positive number.";
     if (validRows.some((r) => !Number.isFinite(r.unitPrice) || r.unitPrice < 0)) e.price = "Price cannot be negative.";
@@ -70,10 +70,16 @@ export function SaleForm({ initial, onDone }: { initial?: Sale; onDone: () => vo
   const submit = () => {
     if (!validate()) return;
     const items: SaleItem[] = rows
-      .filter((r) => r.productId)
+      .filter((r) => r.name.trim())
       .map((r) => {
-        const p = products.find((x) => x.id === r.productId);
-        return { productId: r.productId, productName: p?.name ?? "Item", qty: r.qty, unitPrice: r.unitPrice };
+        const trimmed = r.name.trim();
+        const match = products.find((p) => p.name.toLowerCase() === trimmed.toLowerCase());
+        return {
+          productId: match ? match.id : `adhoc:${trimmed}`,
+          productName: trimmed,
+          qty: r.qty,
+          unitPrice: r.unitPrice,
+        };
       });
     const effectivePaid =
       paymentStatus === "paid" ? total : paymentStatus === "unpaid" ? 0 : paidAmount;
@@ -101,21 +107,19 @@ export function SaleForm({ initial, onDone }: { initial?: Sale; onDone: () => vo
       <div>
         <div className="mb-1.5 flex items-center justify-between">
           <span className="text-xs font-semibold text-muted">{t("common.items")}</span>
-          <Button size="sm" variant="secondary" onClick={() => setRows((r) => [...r, { productId: "", qty: 1, unitPrice: 0 }])}>
+          <Button size="sm" variant="secondary" onClick={() => setRows((r) => [...r, { name: "", qty: 1, unitPrice: 0 }])}>
             <Plus className="h-3.5 w-3.5" /> Add item
           </Button>
         </div>
         <div className="space-y-2">
           {rows.map((row, idx) => (
             <div key={idx} className="grid grid-cols-[1fr_64px_92px_32px] items-center gap-2">
-              <Select value={row.productId} onChange={(e) => setRow(idx, { productId: e.target.value })}>
-                <option value="">Select item…</option>
-                {products.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </Select>
+              <Input
+                value={row.name}
+                onChange={(e) => setRow(idx, { name: e.target.value })}
+                placeholder="Item name…"
+                aria-label="Item name"
+              />
               <Input
                 type="number"
                 min={1}

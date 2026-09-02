@@ -16,18 +16,22 @@ import { computeKpis, type Kpis } from "@/lib/kpis";
 import { translate } from "@/lib/i18n";
 import {
   addCustomer,
+  addDocument,
   addExpense,
   addProduct,
   createSale,
   deleteCustomer,
+  deleteDocument,
   deleteExpense,
   deleteProduct,
   deleteSale,
   updateCustomer,
+  updateDocument,
   updateExpense,
   updateProduct,
   updateSale,
   type CustomerInput,
+  type DocumentInput,
   type ExpenseInput,
   type MutResult,
   type ProductInput,
@@ -50,6 +54,9 @@ export interface BusinessActions {
   addProduct: (i: ProductInput) => MutResult<BusinessData["products"][number]>;
   updateProduct: (id: string, i: ProductInput) => MutResult<BusinessData["products"][number]>;
   deleteProduct: (id: string) => MutResult<null>;
+  addDocument: (i: DocumentInput) => MutResult<BusinessData["documents"][number]>;
+  updateDocument: (id: string, i: DocumentInput) => MutResult<BusinessData["documents"][number]>;
+  deleteDocument: (id: string) => MutResult<null>;
 }
 
 interface AppContextValue {
@@ -163,6 +170,9 @@ export function AppProviders({ children }: { children: ReactNode }) {
       addProduct: (i) => commit(addProduct(base, i)),
       updateProduct: (id, i) => commit(updateProduct(base, id, i)),
       deleteProduct: (id) => commit(deleteProduct(base, id)),
+      addDocument: (i) => commit(addDocument(base, i)),
+      updateDocument: (id, i) => commit(updateDocument(base, id, i)),
+      deleteDocument: (id) => commit(deleteDocument(base, id)),
     };
   }, [data, profile]);
 

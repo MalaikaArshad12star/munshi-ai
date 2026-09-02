@@ -64,6 +64,22 @@ export interface Customer {
   lastVisit: string;
 }
 
+export type DocumentCategory = "receipt" | "invoice" | "expense-bill" | "purchase-bill";
+
+export interface Document {
+  id: string;
+  category: DocumentCategory;
+  title: string;
+  date: string; // ISO
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileData: string; // base64
+  note?: string;
+  relatedSaleId?: string;
+  relatedExpenseId?: string;
+}
+
 export interface BusinessData {
   businessName: string;
   ownerName: string;
@@ -73,6 +89,7 @@ export interface BusinessData {
   sales: Sale[];
   expenses: Expense[];
   customers: Customer[];
+  documents: Document[];
 }
 
 export type Language = "en" | "ur" | "roman";

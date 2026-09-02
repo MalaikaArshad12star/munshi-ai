@@ -172,5 +172,6 @@ export function generateBusinessData(): BusinessData {
     sales,
     expenses,
     customers,
+    documents: [],
   };
 }

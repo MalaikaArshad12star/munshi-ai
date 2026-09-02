@@ -1,6 +1,7 @@
 import type {
   BusinessData,
   Customer,
+  Document,
   Expense,
   ExpenseCategory,
   Product,
@@ -290,4 +291,30 @@ export function updateProduct(
 
 export function deleteProduct(data: BusinessData, id: string): MutResult<null> {
   return { ok: true, value: null, data: { ...data, products: data.products.filter((p) => p.id !== id) } };
+}
+
+// ---------- Document mutations ----------
+
+export type DocumentInput = Omit<Document, "id">;
+
+export function addDocument(data: BusinessData, input: DocumentInput): MutResult<Document> {
+  const doc: Document = { id: uid("d"), ...input };
+  return { ok: true, value: doc, data: { ...data, documents: [doc, ...data.documents] } };
+}
+
+export function updateDocument(
+  data: BusinessData,
+  id: string,
+  input: DocumentInput,
+): MutResult<Document> {
+  const doc: Document = { id, ...input };
+  return {
+    ok: true,
+    value: doc,
+    data: { ...data, documents: data.documents.map((d) => (d.id === id ? doc : d)) },
+  };
+}
+
+export function deleteDocument(data: BusinessData, id: string): MutResult<null> {
+  return { ok: true, value: null, data: { ...data, documents: data.documents.filter((d) => d.id !== id) } };
 }

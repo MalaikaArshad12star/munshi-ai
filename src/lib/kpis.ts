@@ -57,6 +57,7 @@ export interface Kpis {
     score: number;
     status: "excellent" | "good" | "fair" | "poor";
     factors: HealthFactor[];
+    hasData: boolean;
   };
   insights: Insight[];
 }
@@ -180,40 +181,53 @@ export function computeKpis(data: BusinessData): Kpis {
   const inventoryStatus: FactorStatus =
     lowStockCount === 0 ? "good" : lowStockCount <= 2 ? "warning" : "critical";
 
-  const score = Math.round(marginPoints + trendPoints + udhaarPoints + inventoryPoints);
-  const status =
-    score >= 80 ? "excellent" : score >= 60 ? "good" : score >= 40 ? "fair" : "poor";
+  const hasHealthData = data.sales.length > 0;
 
-  const factors: HealthFactor[] = [
-    {
-      key: "margin",
-      label: "Profit margin",
-      status: marginStatus,
-      detail: `${last30.marginPct.toFixed(1)}% net margin this month`,
-      points: marginPoints,
-    },
-    {
-      key: "trend",
-      label: "Sales trend",
-      status: trendStatus,
-      detail: `${growthPct >= 0 ? "+" : ""}${growthPct.toFixed(1)}% week over week`,
-      points: trendPoints,
-    },
-    {
-      key: "udhaar",
-      label: "Udhaar exposure",
-      status: udhaarStatus,
-      detail: `${(udhaarRatio * 100).toFixed(1)}% of monthly revenue`,
-      points: udhaarPoints,
-    },
-    {
-      key: "inventory",
-      label: "Inventory health",
-      status: inventoryStatus,
-      detail: `${lowStockCount} item${lowStockCount === 1 ? "" : "s"} running low`,
-      points: inventoryPoints,
-    },
-  ];
+  const score = hasHealthData
+    ? Math.round(marginPoints + trendPoints + udhaarPoints + inventoryPoints)
+    : 0;
+  const status: Kpis["health"]["status"] = hasHealthData
+    ? score >= 80
+      ? "excellent"
+      : score >= 60
+        ? "good"
+        : score >= 40
+          ? "fair"
+          : "poor"
+    : "fair";
+
+  const factors: HealthFactor[] = hasHealthData
+    ? [
+        {
+          key: "margin",
+          label: "Profit margin",
+          status: marginStatus,
+          detail: `${last30.marginPct.toFixed(1)}% net margin this month`,
+          points: marginPoints,
+        },
+        {
+          key: "trend",
+          label: "Sales trend",
+          status: trendStatus,
+          detail: `${growthPct >= 0 ? "+" : ""}${growthPct.toFixed(1)}% week over week`,
+          points: trendPoints,
+        },
+        {
+          key: "udhaar",
+          label: "Udhaar exposure",
+          status: udhaarStatus,
+          detail: `${(udhaarRatio * 100).toFixed(1)}% of monthly revenue`,
+          points: udhaarPoints,
+        },
+        {
+          key: "inventory",
+          label: "Inventory health",
+          status: inventoryStatus,
+          detail: `${lowStockCount} item${lowStockCount === 1 ? "" : "s"} running low`,
+          points: inventoryPoints,
+        },
+      ]
+    : [];
 
   // --- Rule-based AI-style insights (LLM wiring comes Day 3) ---
   const insights: Insight[] = [];
@@ -260,7 +274,7 @@ export function computeKpis(data: BusinessData): Kpis {
     expenseByCategory,
     topProduct,
     lowStockCount,
-    health: { score, status, factors },
+    health: { score, status, factors, hasData: hasHealthData },
     insights,
   };
 }

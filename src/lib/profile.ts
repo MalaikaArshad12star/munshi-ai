@@ -89,5 +89,6 @@ export function emptyPersonalData(p: BusinessProfile): BusinessData {
     sales: [],
     expenses: [],
     customers: [],
+    documents: [],
   };
 }
